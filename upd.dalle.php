@@ -13,16 +13,20 @@ class Dalle_upd extends Installer
 
     public $actions = [
         [
-            'class' => 'Dalle',
-            'method' => 'Actions'
+            'class' => 'dalle',
+            'method' => 'actions'
         ]
     ];
 
+    public function __construct()
+    {
+      parent::__construct();
+      ee()->load->dbforge();
+      ee()->load->library('smartforge');
+    }
+
     public function install()
     {
-        ee()->load->dbforge();
-        ee()->load->library('smartforge');
-
         parent::install();
 
         if( ! ee()->db->table_exists('dalle_settings') )
@@ -63,7 +67,7 @@ class Dalle_upd extends Installer
           ee()->dbforge->add_field('id', TRUE);
           ee()->dbforge->add_field($columns);
           ee()->dbforge->create_table('dalle_errors', TRUE);
-        }        
+        }
 
         return true;
     }
@@ -91,7 +95,7 @@ class Dalle_upd extends Installer
           if (ee()->db->table_exists($name))
           {
             ee()->dbforge->drop_table($name);
-          }        
+          }
         }
 
         return true;

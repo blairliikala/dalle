@@ -33,12 +33,19 @@ class Settings {
       }
 
       return self::$settings;
-      
+
     }
 
 
-    public function save(Array $settings = array())
+    public function save(Array $settings = array()) : Array
     {
+
+      if (empty($settings))
+      {
+        return [FALSE, ee('dalle:utilities')->error('No settings to update.')];
+      }
+
+      $errors = array();
 
       foreach($settings as $name=>$value)
       {
@@ -61,15 +68,44 @@ class Settings {
         if ($result->isValid())
         {
           $row->save();
-          return TRUE;
+          $this->purgeUnusedSettings($settings);
         }
         else
         {
-          return $row->getAllErrors();
+          $all = $row->getAllErrors();
+          $current_errors = array_map('current', $all);
+          $errors[] = ee('dalle:utilities')->error($current_errors);
         }
+
+        if ( ! empty($errors))
+        {
+          return [FALSE, $errors];
+        }
+
+        return [TRUE, array()];
+
       }
 
-      // TODO Add cleanup.  Remove any settings not in the form.
+    }
+
+
+    public function purgeUnusedSettings(Array $settings = array())
+    {
+      
+      if (empty($settings))
+      {
+        return;
+      }
+
+      $existing = ee('Model')->get('dalle:Settings')->all();
+
+      foreach($existing as $row)
+      {
+        if ( ! in_array($row->name, array_keys($settings)))
+        {
+          $row->delete();
+        }
+      }
 
     }
 }

@@ -34,7 +34,7 @@ class Api {
         return NULL;
       }
 
-      if (empty($this->settings['token']))
+      if (!isset($this->settings['token']) OR empty($this->settings['token']))
       {
         return ee('dalle:utilities')->error('A valid token is required. Request not sent.');
       }

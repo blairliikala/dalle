@@ -24,7 +24,7 @@ class Dalle_mcp extends Mcp
     {
       $html = '';
 
-      if (!$this->settings['token'] OR empty($this->settings['token']))
+      if (!isset($this->settings['token']) OR empty($this->settings['token']))
       {
         $html .= ee('CP/Alert')->makeInline()
           ->asWarning()
@@ -126,7 +126,7 @@ class Dalle_mcp extends Mcp
 
       $html = '';
 
-      if (!$this->settings['token'] OR empty($this->settings['token']))
+      if (!isset($this->settings['token']) OR empty($this->settings['token']))
       {
         $html .= ee('CP/Alert')->makeInline('no')
           ->asWarning()
@@ -181,7 +181,7 @@ class Dalle_mcp extends Mcp
             'fields' => array(
               'token' => array(
                 'type' => 'text',
-                'value' => $this->settings['token'] ?? '',
+                'value' => isset($this->settings['token']) ? $this->settings['token'] : '',
               )
             )
           ), 
@@ -224,7 +224,7 @@ class Dalle_mcp extends Mcp
 
       $html = '';
 
-      if (!$this->settings['token'] OR empty($this->settings['token']))
+      if (!isset($this->settings['token']) OR empty($this->settings['token']))
       {
         $html .= ee('CP/Alert')->makeInline()
           ->asWarning()
@@ -252,7 +252,7 @@ class Dalle_mcp extends Mcp
       $result = ee('dalle:settings')->save($_POST);
       $url = ee('CP/URL')->make('addons/settings/dalle/settings');
 
-      if ($result === TRUE)
+      if ($result[0] === TRUE)
       {
         ee('CP/Alert')->makeBanner('Success')->addToBody('Success')->asSuccess()->defer();
         ee()->functions->redirect($url);
@@ -260,7 +260,7 @@ class Dalle_mcp extends Mcp
       else
       {
         ee('CP/Alert')->makeBanner('Fail')->addToBody('Fail')->asIssue()->defer();
-        return ee()->output->show_user_error('submission', $result, '', $url);
+        return ee()->output->show_user_error('submission', $result[1], '', $url);
       }
     }
 
@@ -294,7 +294,7 @@ class Dalle_mcp extends Mcp
       $table = ee('CP/Table', array(
           //'autosort' => TRUE,
           //'autosearch' => TRUE,
-          )
+        )
       );
       $table->setColumns(
           array(
@@ -359,6 +359,11 @@ class Dalle_mcp extends Mcp
           $result = array();
           foreach($images as $image)
           {
+            if ( ! $image)
+            {
+              continue;
+            }
+
             $result[] = array(
               'url' => $image->getAbsoluteURL(),
               'thumbnail_url' => $image->getAbsoluteThumbnailURL(),

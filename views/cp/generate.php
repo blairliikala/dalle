@@ -30,8 +30,8 @@
         </div>
       </fieldset>
 
-      <fieldset id="fieldset-destination_id" class=" ">
-        <div class="field-instruct ">
+      <fieldset>
+        <div class="field-instruct">
           <label for="smth">Image Size</label>
           <em>The size of the image to be generated. Larger images take a few more moments, and have a slightly higher cost.</em>
         </div>
@@ -109,9 +109,7 @@
   async function generateImage(phrase) {
     results.innerHTML = '';
     hideError();
-
     showLoading();
-
     const params = {
       method: 'get',
       phrase: encodeURIComponent(phrase),
@@ -119,18 +117,12 @@
       //cache: false // TODO Remove this when going to production.
     };
     const url = buildUrl(base_addon, params);
-
     const images = await http(url);
-    console.log(images);
-
     hideLoading();
 
     if ('error' in images) {
-      // TODO error handling.
-      console.error(images);
-
       showError();
-      setErrors('Error', images.error.message);
+      setError('Error', images.error.message);
       return;
     }
 
@@ -139,9 +131,54 @@
 
 
   async function http(url) {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
+      if (!url) return false;
+
+      let headers = new Headers();
+      headers.append('pragma', 'no-cache');
+      headers.append('cache-control', 'no-cache');
+
+      const response = await fetch(url, {headers: headers})
+          .catch(error => {
+              //this.showNotification(error, 'warning', 'fetch-error');
+              console.debug('Error Fetching URL.', {url}, {error});
+              return false;
+          });
+
+      if (!response) return false;
+
+      if (!response.ok) {
+          //this.showNotification('Unable to Fetch URL', 'warning', 'fetch-error');
+          console.error({response}, {url});
+          return false;
+      };
+
+      try {
+          return await response.clone().json();
+      } catch(error) {
+          let text = await response.clone().text();
+          switch(true) {
+              case text.includes('Log In | ExpressionEngine') :
+                  console.debug({error}, {text});
+                  //this.showNotification("Sign back in to get the latest updates.", 'warning', 'logged-out-error');
+                  break;
+
+              case text.includes('ParseError Caught') :
+                  console.debug("Possible PHP error.", {error}, {text});
+                  //this.showNotification("There was an error trying to get updated info.", 'warning', 'php-error');
+                  break;
+
+              case text.includes('<!doctype html>') :
+                  console.debug("Returned HTML.", {error}, {text});
+                  //this.showNotification("There was an error trying to get updated info.", 'warning', 'decode-error');
+                  break;
+
+              default:
+                  console.error({error}, {text});
+                  //this.showNotification("There was an error trying to get updated info. <br />" +error, 'warning', 'decode-error');
+          }
+          return false;
+      }
+      //return response.clone().json().catch(() => response.text())
   }
 
   function buildUrl(base, params) {
@@ -185,7 +222,7 @@
     return document.querySelector('input[name="size"]:checked').value;
   }
   
-  function setErrors(title, desc) {
+  function setError(title, desc) {
     const div = document.querySelector('#errors');
     const paragraphs = div.querySelectorAll('p');
     const divTitle = paragraphs[0];

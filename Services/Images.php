@@ -33,7 +33,20 @@ class Images
       $image = end($search_results);
       $image = end($image);
 
-      $file = ee('Model')->get('File', $image->file_id)->first();
+      if ($image->file_id === 0)
+      {
+        // No file ID assigned if file wasn't created. So create a new one.
+        $post_fields = array(
+          'phrase' => $phrase,
+          'size'   => $size,
+        );
+  
+        list($file, $db) = $this->createImages($post_fields);
+      }
+      else 
+      {
+        $file = ee('Model')->get('File', $image->file_id)->first();
+      }
     }
 
     if (!$cache OR $search_results->count() === 0)
@@ -126,7 +139,18 @@ class Images
 
   private function addToFileManager(Object $image, Array $post_fields) : Object
   {
-    $upload_location_id = $this->settings['destination_id'] ?? ee('Model')->get('UploadDestination')->first();
+    if (isset($this->settings['destination_id']) AND !empty($this->settings['destination_id']))
+    {
+      $upload_location_id = $this->settings['destination_id'];
+    }
+    else
+    {
+      $upload = ee('Model')->get('UploadDestination')->first();
+      if ($upload)
+      {
+        $upload_location_id = $upload->id;
+      }
+    }
 
     if (!$upload_location_id)
     {
@@ -140,6 +164,7 @@ class Images
     $filepath = $destination->server_path.$file_name;
 
     // Save File, base 64
+    /*
     if (isset($image->b64_json))
     {
       $image_data = base64_decode($image->b64_json);
@@ -147,6 +172,7 @@ class Images
       $jpg = imagejpeg($source, $filepath, 100);
       $copy_result = $jpg;
     }
+    */
 
     // Save jpg.
     if (isset($image->url))
@@ -154,7 +180,7 @@ class Images
       $copy_result = copy($image->url, $filepath);
     }
 
-    if (!$copy_result)
+    if (!isset($copy_result))
     {
       return ee('dalle:utilities')->error('Unable to copy file.');
     }

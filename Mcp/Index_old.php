@@ -93,7 +93,7 @@ class Index extends AbstractRoute
                 ->render(ee('CP/URL', 'addons/settings/dalle/')->addQueryStringVariables($filter_values));
 
 
-        if (!$this->settings['token'] OR empty($this->settings['token']))
+        if (!isset($this->settings['token']) OR empty($this->settings['token']))
         {
 
         }
