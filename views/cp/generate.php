@@ -145,7 +145,6 @@
 
       const response = await fetch(url, {headers: headers})
           .catch(error => {
-              //this.showNotification(error, 'warning', 'fetch-error');
               console.debug('Error Fetching URL.', {url}, {error});
               return false;
           });
@@ -153,7 +152,6 @@
       if (!response) return false;
 
       if (!response.ok) {
-          //this.showNotification('Unable to Fetch URL', 'warning', 'fetch-error');
           console.error("Fetch Error", {response}, {url});
       };
 
@@ -164,26 +162,21 @@
           switch(true) {
               case text.includes('Log In | ExpressionEngine') :
                   console.debug({error}, {text});
-                  //this.showNotification("Sign back in to get the latest updates.", 'warning', 'logged-out-error');
                   break;
 
               case text.includes('ParseError Caught') :
                   console.debug("Possible PHP error.", {error}, {text});
-                  //this.showNotification("There was an error trying to get updated info.", 'warning', 'php-error');
                   break;
 
               case text.includes('<!doctype html>') :
                   console.debug("Returned HTML.", {error}, {text});
-                  //this.showNotification("There was an error trying to get updated info.", 'warning', 'decode-error');
                   break;
 
               default:
                   console.error({error}, {text});
-                  //this.showNotification("There was an error trying to get updated info. <br />" +error, 'warning', 'decode-error');
           }
           return false;
       }
-      //return response.clone().json().catch(() => response.text())
   }
 
   function buildUrl(base, params) {
