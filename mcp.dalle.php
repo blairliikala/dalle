@@ -101,6 +101,10 @@ class Dalle_mcp extends Mcp
           $time_format  = ee()->localize->human_time($row->created);
           $asset_link   = ee('CP/URL', 'files/file/view/'.$row->file_id);
           $asset = ee('Model')->get('File', $row->file_id)->first();
+          if (!$asset)
+          {
+            continue;
+          }
           $image_url = $asset ? $asset->getAbsoluteURL() : ''; // Should be temp?
 
           $table_data[] = array(
@@ -361,6 +365,12 @@ class Dalle_mcp extends Mcp
           {
             if ( ! $image)
             {
+              continue;
+            }        
+
+            if (isseT($image->error))
+            {
+              $result = $images;
               continue;
             }
 

@@ -70,7 +70,11 @@ class Images
 
     if (isset($images->error))
     {
-      ee('dalle:utilities')->logErrorLocally($images->error->message, $images->error->code, $images->error->type);
+      $message = isset($images->error->message) ? $images->error->message : '';
+      $code = isset($images->error->code) ? $images->error->code : '';
+      $type = isset($images->error->type) ? $images->error->type : '';
+
+      ee('dalle:utilities')->logErrorLocally($message, $code, $type);
       return [$images, []];
     }
 

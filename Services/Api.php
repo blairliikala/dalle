@@ -36,7 +36,7 @@ class Api {
 
       if (!isset($this->settings['token']) OR empty($this->settings['token']))
       {
-        return ee('dalle:utilities')->error('A valid token is required. Request not sent.');
+        return ee('dalle:utilities')->error('A valid token is required.  Please create one in the Open AI website, and add it to the add-on settings.');
       }
 
       // cURL is an ExpressionEngine requirement so we can assume it is installed.

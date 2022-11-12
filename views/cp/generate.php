@@ -114,15 +114,23 @@
       method: 'get',
       phrase: encodeURIComponent(phrase),
       size: getSizeValue(),
-      //cache: false // TODO Remove this when going to production.
+      cache: false
     };
     const url = buildUrl(base_addon, params);
     const images = await http(url);
     hideLoading();
 
-    if ('error' in images) {
+    console.log(images);
+
+    if (!images) {
+      showError('Error','There was a problem making the request.  Check the console for more details.');
+      return;
+    }
+
+    if ('error' in images[0]) {
       showError();
-      setError('Error', images.error.message);
+      console.debug("Images", images);
+      setError('Error', images[0].error.message);
       return;
     }
 
@@ -148,8 +156,7 @@
 
       if (!response.ok) {
           //this.showNotification('Unable to Fetch URL', 'warning', 'fetch-error');
-          console.error({response}, {url});
-          return false;
+          console.error("Fetch Error", {response}, {url});
       };
 
       try {

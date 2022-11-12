@@ -121,6 +121,7 @@ class Utilities
     $sidebar->addItem(lang('generate'), ee('CP/URL', 'addons/settings/dalle'));
     $sidebar->addItem(lang('settings'), ee('CP/URL', 'addons/settings/dalle/settings'));
     $sidebar->addItem(lang('error_log'), ee('CP/URL', 'addons/settings/dalle/errorlog'));
+    //$sidebar->addItem(lang('images'), ee('CP/URL', 'addons/settings/dalle/list'));
     $sidebar->render();
 
     ee()->cp->header = array(

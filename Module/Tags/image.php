@@ -32,24 +32,19 @@ class Image extends AbstractRoute
 
     if (isset($file->error))
     {
-      /*
-      header('Content-Type: application/json; charset=utf-8');
-      echo json_encode($file, JSON_PRETTY_PRINT);
-      exit;
-      */
-
       $variables = array(
         'url' => '',
         'id' => '',
         'phrase' => '',
-      );      
+        'error' => isset($file->error->message) ? $file->error->message : '',
+      );
     }
 
     $variables = array(
       'url' => !isset($file->error) ? $file->getAbsoluteURL() : '',
       'id' => !isset($file->error) ? $file->getId() : '',
       'phrase' => $phrase,
-      'error' => isset($file->error) ? $file->error->message : '',
+      'error' => isset($file->error->message) ? $file->error->message : '',
     );
 
     return ee()->TMPL->parse_variables($tagdata, array($variables));

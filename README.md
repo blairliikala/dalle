@@ -8,7 +8,7 @@ Type in a phrase to have the Dall-E image AI generate an image, unique each time
 
 Template tags are listed below.
 
-```php
+```html
 {exp:dalle:image
   phrase="software developer throwing a computer into a dumpster on fire like the movie office space"
 }
@@ -18,7 +18,7 @@ Template tags are listed below.
 
 Use with a custom text field
 
-```php
+```html
 {exp:dalle:image
   phrase="{image_phrase}"
 }
@@ -34,3 +34,10 @@ Use with a custom text field
 | size | Size of the image to create.  Currently there are only 3 sizes.  Costs increase for larger images. | 256x256 |
 
 ## Tags
+
+| Name | Description |
+| -----|-------------|
+| `url` | Returns the full path to the image from the file manager for the first image found. |
+| `id` | The ID of the image in the file manager for passing onto another tag. |
+| `phrase` | The phrase used to create the image. |
+| `error` | Text of any errors that happen. Blank if none. |
