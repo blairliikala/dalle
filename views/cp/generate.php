@@ -120,8 +120,6 @@
     const images = await http(url);
     hideLoading();
 
-    console.log(images);
-
     if (!images) {
       showError('Error','There was a problem making the request.  Check the console for more details.');
       return;
