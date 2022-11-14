@@ -4,11 +4,18 @@ ExpressionEngine add-on integration with Dall-E 2
 
 Type in a phrase to have the Dall-E image AI generate an image, unique each time. Created images are automaticaly added to the EE file manager and phrases are cached.
 
-## Instal
+![Screenshot 1](Screenshots/1.png)
+![Screenshot 1](Screenshots/2.png)
+![Screenshot 1](Screenshots/3.png)
+![Screenshot 1](Screenshots/4.png)
+![Screenshot 1](Screenshots/6.png)
+
+## Install
 
 - Install addon by copying the files to the add-on directory within a folder called `dalle`.
 - Create an account at [beta.openai.com](https://beta.openai.com/) and generate an API secret key [beta.openai.com/account/api-keys](https://beta.openai.com/account/api-keys) At the time of this writing there were about $18 in free credits to create images.
 - Add the key to the setting page, and set a file directory to put created images in.
+![Screenshot 1](Screenshots/5.png)
 - Either using a template tag or the add-on, type a phrase in to have Dall-e create an image and use it like a normal image through the file manager!
 
 ## Tag
