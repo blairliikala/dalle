@@ -78,7 +78,7 @@
         ->addToBody('Something went wrong. Try again.')
         ->render();
     ?>
-  </aside>  
+  </aside>
 
   <section id="results" class="image_grid panel-body"></section>
 
@@ -219,7 +219,7 @@
   function getSizeValue() {
     return document.querySelector('input[name="size"]:checked').value;
   }
-  
+
   function setError(title, desc) {
     const div = document.querySelector('#errors');
     const paragraphs = div.querySelectorAll('p');
