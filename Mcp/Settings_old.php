@@ -21,8 +21,13 @@ class Settings extends AbstractRoute
 
   public function process($id = false)
   {
+
+    // Waiting for EE to change some things before moving mcp methods to this location.
+
     $this->addBreadcrumb('settings', lang('settings'));
     $this->setHeading(lang('settings'));
+
+    // Important stuff goes here.
 
     $this->setBody('cp/formbug', $vars);
     return $this;

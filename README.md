@@ -27,7 +27,7 @@ Template tags are listed below.
 {/exp:dalle:image}
 ```
 
-Use with a custom text field
+Use with a custom text field we will just called `image_phrase`
 
 ```html
 {exp:dalle:image
