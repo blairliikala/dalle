@@ -143,32 +143,20 @@ class Images
 
   private function addToFileManager(Object $image, Array $post_fields) : Object
   {
-    if (isset($this->settings['destination_id']) AND !empty($this->settings['destination_id']))
-    {
-      $upload_location_id = $this->settings['destination_id'];
-    }
-    else
-    {
-      $upload = ee('Model')->get('UploadDestination')->first();
-      if ($upload)
-      {
-        $upload_location_id = $upload->id;
-      }
-    }
 
-    if (!$upload_location_id)
-    {
-      return ee('dalle:utilities')->error('No Upload directory set.');
-    }
+    $upload_location_id = $this->getDestinationId();
 
+    if ( ! $upload_location_id OR $upload_location_id === 0)
+    {
+      return ee('dalle:utilities')->error('No Upload directory was set.');
+    }
 
     $destination = ee('Model')->get('UploadDestination', $upload_location_id)->first();
     $file_name = rand(10000000,99999999).".jpg";
     $title = substr($post_fields['phrase'], 0, 75);
     $filepath = $destination->server_path.$file_name;
 
-    // Save File, base 64
-    /*
+    // Save File, base 64. Usually not used.
     if (isset($image->b64_json))
     {
       $image_data = base64_decode($image->b64_json);
@@ -176,7 +164,6 @@ class Images
       $jpg = imagejpeg($source, $filepath, 100);
       $copy_result = $jpg;
     }
-    */
 
     // Save jpg.
     if (isset($image->url))
@@ -199,11 +186,42 @@ class Images
     $file->upload_date = time();
     $file->title = $title;
     $file->credit = 'Made with Dall-E';
-    $file->description = $post_fields['phrase'] ?? '';
+    $file->description = $post_fields['phrase'];
     $file->save();
 
     return $file;
 
+  }
+
+
+  private function getDestinationId()
+  {
+    if (isset($this->settings['destination_id']) AND !empty($this->settings['destination_id']))
+    {
+      return $this->settings['destination_id'];
+    }
+
+    // No upload directories created, they have to make one first.
+    $all = ee('Model')->get('UploadDestination')->all();
+    if (empty($all))
+    {
+      return 0;
+    }
+
+    // If the theme was installed, use 4 "blog".  1-3 are other private things?
+    $upload = ee('Model')->get('UploadDestination', 4)->first(); // First is avitars.
+    if ($upload AND isset($upload->id))
+    {
+      return $upload->id;
+    }
+
+    // First could be Avitars, or one they create. This is all fallback though.
+    $upload = ee('Model')->get('UploadDestination')->first(); 
+    if ($upload AND isset($upload->id))
+    {
+      return $upload->id;
+    }
+    
   }
 
 }
