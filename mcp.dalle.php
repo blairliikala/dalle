@@ -55,8 +55,6 @@ class Dalle_mcp extends Mcp
     public function list()
     {
 
-      //$this->addBreadcrumb('index', lang('images'));
-
       $vars['heading'] = lang('images');
 
       $images = ee('Model')->get('dalle:Images')->order('created', 'DESC')->all();
@@ -173,6 +171,7 @@ class Dalle_mcp extends Mcp
         if ($destination->memberHasAccess(ee()->session->getMember()) === false) {
           continue;
         }
+        // Skip everything but local until we can figure out how to get other adaptors to work (S3..etc)
         if ($destination->adapter !== 'local') {
           continue;
         }
@@ -243,7 +242,6 @@ class Dalle_mcp extends Mcp
       $html .= ee('View')->make('ee:_shared/form')->render($vars);      
 
       return [
-        //'body' => $form->render(),
         'body' => $html,
         'breadcrumb' => [
             ee('CP/URL')->make('addons/settings/dalle/settings')->compile() => lang('settings')
@@ -274,7 +272,6 @@ class Dalle_mcp extends Mcp
 
     public function errorlog()
     {
-      //$this->addBreadcrumb('index', lang('images'));
 
       $vars['heading'] = lang('error_log');
 
@@ -290,19 +287,7 @@ class Dalle_mcp extends Mcp
       $page       = ((int) ee('Request')->get('page')) ?: 1;
       $offset     = (int) ($page - 1) * $filter_values['perpage'];
 
-      /*
-      $images1 = ee('Model')
-                      ->get('dalle:Errors')
-                      ->offset($offset)
-                      ->limit($filter_values['perpage'])
-                      ->all();
-      */
-
-      $table = ee('CP/Table', array(
-          //'autosort' => TRUE,
-          //'autosearch' => TRUE,
-        )
-      );
+      $table = ee('CP/Table', array());
       $table->setColumns(
           array(
               'ID',

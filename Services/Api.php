@@ -13,7 +13,7 @@ class Api {
     }
 
 
-    public function create(Array $post_fields = array())
+    public function create(Array $post_fields = array()) : Object
     {
       $url = $this->base.'/images/generations';
       $post_fields = array(
@@ -31,7 +31,7 @@ class Api {
     {
       if (empty($url))
       {
-        return NULL;
+        return ee('dalle:utilities')->error('No URL provided to get');
       }
 
       if (!isset($this->settings['token']) OR empty($this->settings['token']))

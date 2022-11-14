@@ -38,7 +38,7 @@ class Utilities
 
   }
 
-  public function logError($error)
+  public function logError($error) : Object
   {
     $message = $error->message ?? 'No message provided.';
 
@@ -115,7 +115,7 @@ class Utilities
   }
 
 
-  public function generateSidebar()
+  public function generateSidebar() : Object
   {
     $sidebar = ee('CP/Sidebar')->make();
     $sidebar->addItem(lang('generate'), ee('CP/URL', 'addons/settings/dalle'));

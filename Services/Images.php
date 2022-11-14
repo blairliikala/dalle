@@ -141,6 +141,7 @@ class Images
   }
 
 
+  // Currenty this only supports the local adaptor and local files.
   private function addToFileManager(Object $image, Array $post_fields) : Object
   {
 
@@ -194,7 +195,7 @@ class Images
   }
 
 
-  private function getDestinationId()
+  private function getDestinationId() : Int
   {
     if (isset($this->settings['destination_id']) AND !empty($this->settings['destination_id']))
     {
