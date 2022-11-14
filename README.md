@@ -23,7 +23,8 @@ Use with a custom text field
   phrase="{image_phrase}"
 }
   <img src="{url}" />
-{/exp:
+{/exp:dalle:image}
+```
 
 ## Parameters
 
