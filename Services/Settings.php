@@ -68,7 +68,7 @@ class Settings {
         if ($result->isValid())
         {
           $row->save();
-          $this->purgeUnusedSettings($settings);
+          //$this->purgeUnusedSettings($settings);
         }
         else
         {
@@ -77,21 +77,21 @@ class Settings {
           $errors[] = ee('dalle:utilities')->error($current_errors);
         }
 
-        if ( ! empty($errors))
-        {
-          return [FALSE, $errors];
-        }
-
-        return [TRUE, array()];
-
       }
+
+      if ( ! empty($errors))
+      {
+        return [FALSE, $errors];
+      }      
+
+      return [TRUE, array()];
 
     }
 
 
     public function purgeUnusedSettings(Array $settings = array())
     {
-      
+
       if (empty($settings))
       {
         return;
