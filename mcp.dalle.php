@@ -171,7 +171,10 @@ class Dalle_mcp extends Mcp
       $destinations = array();
       foreach ($upload_destinations->all() as $destination) {
         if ($destination->memberHasAccess(ee()->session->getMember()) === false) {
-            continue;
+          continue;
+        }
+        if ($destination->adapter !== 'local') {
+          continue;
         }
         $display_name = htmlspecialchars($destination->name, ENT_QUOTES, 'UTF-8');
         $destinations[$destination->getId()] = $display_name;
