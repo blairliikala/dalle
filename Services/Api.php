@@ -21,7 +21,7 @@ class Api {
         "n"      => $post_fields['n'] ?? 1,
         "size"   => $post_fields['size'] ?? $this->settings['size'],
         "response_format" => $post_fields['response_format'] ?? $this->settings['response_format'],
-        // "user" => "",
+        // "user" => "", // For tracking abuse?
       );
       return $this->http($url, 'POST', $post_fields);
     }
