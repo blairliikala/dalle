@@ -2,7 +2,7 @@
 
 ExpressionEngine add-on integration with Dall-E 2
 
-Type in a phrase to have the Dall-E image AI generate an image, unique each time. Created images are automaticaly added to the EE file manager and phrases are cached.
+Type in a phrase to have the Dall-E image AI generate an image, unique each time. Created images are automatically added to the EE file manager and phrases are cached.
 
 ![Screenshot 1](Screenshots/1.png)
 ![Screenshot 1](Screenshots/6.png)
