@@ -71,14 +71,17 @@
         ->render();
     ?>
   </aside>
-  <aside id="errors" class="hidden panel-body">
-    <?php echo ee('CP/Alert')->makeInline('error_form')
-        ->asIssue()
-        ->withTitle('Error')
-        ->addToBody('Something went wrong. Try again.')
-        ->render();
-    ?>
-  </aside>
+
+  <template id="error_template">
+  <?php echo ee('CP/Alert')->makeInline('error_form')
+      ->asIssue()
+      ->withTitle('Error')
+      ->addToBody('Something went wrong. Try again.')
+      ->render();
+  ?>
+  </template>
+
+  <aside id="errors" class="hidden panel-body"></aside>
 
   <section id="results" class="image_grid panel-body"></section>
 
@@ -94,10 +97,11 @@
   const wordcount = document.querySelector('#wordcount');
   const countRemaining = wordcount.querySelector('#ch_left');
 
+  var errors = [];
+
   submit.addEventListener('click', (e) => {
     e.preventDefault();
-    const value = input.value;
-    if (!value) return;
+    const value = input.value || '';
     generateImage(value);
   });
 
@@ -108,7 +112,14 @@
 
   async function generateImage(phrase) {
     results.innerHTML = '';
-    hideError();
+    clearAllErrors();
+
+    if (!phrase) {
+      console.warn('No input phrase!');
+      createError('No phrase entered.', 'Add a phrase for the AI to think hard on.');
+      return;
+    };
+
     showLoading();
     const params = {
       method: 'get',
@@ -121,14 +132,14 @@
     hideLoading();
 
     if (!images) {
-      showError('Error','There was a problem making the request.  Check the console for more details.');
+      createError('Error','There was a problem making the request.  Check the console for more details.');
+      console.warn(images);
       return;
     }
 
-    if ('error' in images[0]) {
-      showError();
-      console.debug("Images", images);
-      setError('Error', images[0].error.message);
+    if ('error' in images) {
+      console.warn("Images", images);
+      createError('Error', images.error.message);
       return;
     }
 
@@ -144,36 +155,43 @@
       headers.append('cache-control', 'no-cache');
 
       const response = await fetch(url, {headers: headers})
-          .catch(error => {
-              console.debug('Error Fetching URL.', {url}, {error});
-              return false;
-          });
+        .catch(error => {
+          console.warn('Error Fetching URL.', {url}, {error});
+          createError('Error trying to communicate with the EE control panel')
+          return false;
+        });
 
       if (!response) return false;
 
       if (!response.ok) {
-          console.error("Fetch Error", {response}, {url});
+        createError('Error in the API response. Check the console for more info');
+        console.warn("Fetch Not OK", {response}, {url});
+        return false;
       };
 
       try {
           return await response.clone().json();
       } catch(error) {
-          let text = await response.clone().text();
-          switch(true) {
-              case text.includes('Log In | ExpressionEngine') :
-                  console.debug({error}, {text});
-                  break;
+        let text = await response.clone().text();
+        switch(true) {
+          case text.includes('Log In | ExpressionEngine') :
+            console.warn({error}, {text});
+            createError('You are logged out.', 'Try logging back in or refreshing the page.');
+            break;
 
-              case text.includes('ParseError Caught') :
-                  console.debug("Possible PHP error.", {error}, {text});
-                  break;
+          case text.includes('ParseError Caught') :
+            console.warn("Possible PHP error.", {error}, {text});
+            createError('Possible PHP error in response.', 'Check the browser console for more info.');
+            break;
 
-              case text.includes('<!doctype html>') :
-                  console.debug("Returned HTML.", {error}, {text});
-                  break;
+          case text.includes('<!doctype html>') :
+            console.warn("Returned HTML.", {error}, {text});
+            createError('EE Console may have returned the wrong format', 'HTML may have been returned instead of JSON. Check the browser console for more info.')
+            break;
 
-              default:
-                  console.error({error}, {text});
+          default:
+            createError('Error', text);
+            console.error({error}, {text});
           }
           return false;
       }
@@ -220,13 +238,27 @@
     return document.querySelector('input[name="size"]:checked').value;
   }
 
-  function setError(title, desc) {
+  function createError(title, desc) {
     const div = document.querySelector('#errors');
-    const paragraphs = div.querySelectorAll('p');
+
+    const errorTemplate = document.querySelector('#error_template');
+    if (!errorTemplate) return;
+    const clone = errorTemplate.content.cloneNode(true);
+
+    const paragraphs = clone.querySelectorAll('p');
     const divTitle = paragraphs[0];
     const divDesc = paragraphs[1];
     if (divTitle && title) divTitle.innerHTML = title;
     if (divDesc && desc) divDesc.innerHTML = desc;
+
+    div.appendChild(clone);
+    showError();
+  }
+
+  function clearAllErrors() {
+    const errors = document.querySelector('#errors');
+    errors.innerHTML = '';
+    hideError();
   }
 
 </script>
