@@ -145,14 +145,13 @@ class Images
   private function addToFileManager(Object $image, Array $post_fields) : Object
   {
 
-    $upload_location_id = $this->getDestinationId();
+    $destination = $this->getDestination();
 
-    if ( ! $upload_location_id OR $upload_location_id === 0)
+    if ( ! $destination)
     {
       return ee('dalle:utilities')->error('No Upload directory was set.');
     }
 
-    $destination = ee('Model')->get('UploadDestination', $upload_location_id)->first();
     $file_name = rand(10000000,99999999).".jpg";
     $title = substr($post_fields['phrase'], 0, 75);
     $filepath = $destination->server_path.$file_name;
@@ -178,7 +177,7 @@ class Images
     }
 
     $file = ee('Model')->make('File');
-    $file->upload_location_id = $upload_location_id;
+    $file->upload_location_id = $destination->getId() ?? $destination->id;
     // $file->directory_id =
     $file->file_name = $file_name;
     $file->mime_type = 'image/jpeg';
@@ -195,32 +194,33 @@ class Images
   }
 
 
-  private function getDestinationId() : Int
+  private function getDestinationId()
   {
-    if (isset($this->settings['destination_id']) AND !empty($this->settings['destination_id']))
+    if (!empty($this->settings['destination_id']))
     {
-      return $this->settings['destination_id'];
+      $id = $this->settings['destination_id'];
+      return ee('Model')->get('UploadDestination', $id)->first();
     }
-
+  
     // No upload directories created, they have to make one first.
     $all = ee('Model')->get('UploadDestination')->all();
     if (empty($all))
     {
-      return 0;
+      return NULL;
     }
-
+  
     // If the theme was installed, use 4 "blog".  1-3 are other private things?
     $upload = ee('Model')->get('UploadDestination', 4)->first(); // First is avitars.
-    if ($upload AND isset($upload->id))
+    if ($upload)
     {
-      return $upload->id;
+      return $upload;
     }
-
+  
     // First could be Avitars, or one they create. This is all fallback though.
     $upload = ee('Model')->get('UploadDestination')->first(); 
-    if ($upload AND isset($upload->id))
+    if ($upload)
     {
-      return $upload->id;
+      return $upload;
     }
     
   }
