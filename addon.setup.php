@@ -5,7 +5,7 @@ return [
     'author_url'        => 'blairliikala.com',
     'name'              => 'Dall-e AI Image Creation',
     'description'       => 'Create images from the AI Dall-E',
-    'version'           => '0.0.2',
+    'version'           => '0.3.0',
     'namespace'         => 'Blairliikala\Dalle',
     'settings_exist'    => true,
     'requires'          => [

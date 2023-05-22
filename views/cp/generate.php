@@ -2,6 +2,7 @@
   .hidden {
     display: none
   }
+
   .image_grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
@@ -12,10 +13,12 @@
 
 <div class="box panel">
   <div class="panel-heading">
-      <div class="title-bar">
-          <h3 class="title-bar__title title-bar--large"><?=$heading?></h3>
-          <div class="filters-toolbar title-bar__extra-tools"></div>
-      </div>
+    <div class="title-bar">
+      <h3 class="title-bar__title title-bar--large">
+        <?= $heading ?>
+      </h3>
+      <div class="filters-toolbar title-bar__extra-tools"></div>
+    </div>
   </div>
 
   <div class="panel-body">
@@ -23,7 +26,8 @@
       <fieldset>
         <div class="field-instruct">
           <label for="phrase">Phrase</label>
-          <em>Type a descriptive phrase for the AI to generate an image. <span id="wordcount"><span id="ch_left">1000</span>/1000</span></em>
+          <em>Type a descriptive phrase for the AI to generate an image. <span id="wordcount"><span
+                id="ch_left">1000</span>/1000</span></em>
         </div>
         <div class="field-control">
           <input type="text" name="phrase" id="phrase" minlengh="5" maxlength="1000" required>
@@ -33,21 +37,22 @@
       <fieldset>
         <div class="field-instruct">
           <label for="smth">Image Size</label>
-          <em>The size of the image to be generated. Larger images take a few more moments, and have a slightly higher cost.</em>
+          <em>The size of the image to be generated. Larger images take a few more moments, and have a slightly higher
+            cost.</em>
         </div>
         <div class="field-control">
           <div class="fields-select">
             <div class="field-inputs">
               <label class="checkbox-label">
-                <input type="radio" name="size" value="256x256" <?php if($size === '256x256'): ?>checked<?php endif; ?>>
+                <input type="radio" name="size" value="256x256" <?php if ($size === '256x256'): ?>checked<?php endif; ?>>
                 <div class="checkbox-label__text">256x256</div>
               </label>
               <label class="checkbox-label">
-                <input type="radio" name="size" value="512x512" <?php if($size === '512x512'): ?>checked<?php endif; ?>>
+                <input type="radio" name="size" value="512x512" <?php if ($size === '512x512'): ?>checked<?php endif; ?>>
                 <div class="checkbox-label__text">512x512</div>
               </label>
               <label class="checkbox-label">
-                <input type="radio" name="size" value="1024x1024" <?php if($size === '1024x1024'): ?>checked<?php endif; ?>>
+                <input type="radio" name="size" value="1024x1024" <?php if ($size === '1024x1024'): ?>checked<?php endif; ?>>
                 <div class="checkbox-label__text">1024x1024</div>
               </label>
             </div>
@@ -57,7 +62,7 @@
 
       <div class="panel-footer">
         <div class="form-btns">
-            <button class="button button--primary" id="generate" type="submit" value="Generate">Generate</button>
+          <button class="button button--primary" id="generate" type="submit" value="Generate">Generate</button>
         </div>
       </div>
 
@@ -66,19 +71,19 @@
 
   <aside id="loader" class="hidden panel-body">
     <?php echo ee('CP/Alert')->makeInline('loading')
-        ->asLoading()
-        ->withTitle('Generating...Leave this window open while running.')
-        ->render();
+      ->asLoading()
+      ->withTitle('Generating...Leave this window open while running.')
+      ->render();
     ?>
   </aside>
 
   <template id="error_template">
-  <?php echo ee('CP/Alert')->makeInline('error_form')
+    <?php echo ee('CP/Alert')->makeInline('error_form')
       ->asIssue()
       ->withTitle('Error')
       ->addToBody('Something went wrong. Try again.')
       ->render();
-  ?>
+    ?>
   </template>
 
   <aside id="errors" class="hidden panel-body"></aside>
@@ -132,14 +137,14 @@
     hideLoading();
 
     if (!images) {
-      createError('Error','There was a problem making the request.  Check the console for more details.');
+      createError('Error', 'There was a problem making the request.  Check the console for more details.');
       console.warn(images);
       return;
     }
 
-    if ('error' in images) {
+    if ('error' in images.at(0)) {
       console.warn("Images", images);
-      createError('Error', images.error.message);
+      createError('Error', images.at(0).error.message);
       return;
     }
 
@@ -148,53 +153,53 @@
 
 
   async function http(url) {
-      if (!url) return false;
+    if (!url) return false;
 
-      let headers = new Headers();
-      headers.append('pragma', 'no-cache');
-      headers.append('cache-control', 'no-cache');
+    let headers = new Headers();
+    headers.append('pragma', 'no-cache');
+    headers.append('cache-control', 'no-cache');
 
-      const response = await fetch(url, {headers: headers})
-        .catch(error => {
-          console.warn('Error Fetching URL.', {url}, {error});
-          createError('Error trying to communicate with the EE control panel')
-          return false;
-        });
-
-      if (!response) return false;
-
-      if (!response.ok) {
-        createError('Error in the API response. Check the console for more info');
-        console.warn("Fetch Not OK", {response}, {url});
+    const response = await fetch(url, { headers: headers })
+      .catch(error => {
+        console.warn('Error Fetching URL.', { url }, { error });
+        createError('Error trying to communicate with the EE control panel')
         return false;
-      };
+      });
 
-      try {
-          return await response.clone().json();
-      } catch(error) {
-        let text = await response.clone().text();
-        switch(true) {
-          case text.includes('Log In | ExpressionEngine') :
-            console.warn({error}, {text});
-            createError('You are logged out.', 'Try logging back in or refreshing the page.');
-            break;
+    if (!response) return false;
 
-          case text.includes('ParseError Caught') :
-            console.warn("Possible PHP error.", {error}, {text});
-            createError('Possible PHP error in response.', 'Check the browser console for more info.');
-            break;
+    if (!response.ok) {
+      createError('Error in the API response. Check the console for more info');
+      console.warn("Fetch Not OK", { response }, { url });
+      return false;
+    };
 
-          case text.includes('<!doctype html>') :
-            console.warn("Returned HTML.", {error}, {text});
-            createError('EE Console may have returned the wrong format', 'HTML may have been returned instead of JSON. Check the browser console for more info.')
-            break;
+    try {
+      return await response.clone().json();
+    } catch (error) {
+      let text = await response.clone().text();
+      switch (true) {
+        case text.includes('Log In | ExpressionEngine'):
+          console.warn({ error }, { text });
+          createError('You are logged out.', 'Try logging back in or refreshing the page.');
+          break;
 
-          default:
-            createError('Error', text);
-            console.error({error}, {text});
-          }
-          return false;
+        case text.includes('ParseError Caught'):
+          console.warn("Possible PHP error.", { error }, { text });
+          createError('Possible PHP error in response.', 'Check the browser console for more info.');
+          break;
+
+        case text.includes('<!doctype html>'):
+          console.warn("Returned HTML.", { error }, { text });
+          createError('EE Console may have returned the wrong format', 'HTML may have been returned instead of JSON. Check the browser console for more info.')
+          break;
+
+        default:
+          createError('Error', text);
+          console.error({ error }, { text });
       }
+      return false;
+    }
   }
 
   function buildUrl(base, params) {
@@ -222,7 +227,7 @@
   }
 
   function buildResultsHTML(images, url) {
-    return images.map( image => `
+    return images.map(image => `
       <div class="file-grid__file">
         <div class="file-thumbnail__wrapper">
           <a href="${base_file}/${image.file_id}">
